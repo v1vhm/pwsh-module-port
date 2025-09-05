@@ -16,3 +16,5 @@ Thumbs.db
 *.ps1xml
 *.cache
 
+# Test results
+testResults.xml
