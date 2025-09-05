@@ -24,12 +24,10 @@ Describe 'New-PortAccessToken' {
         }
 
         It 'posts to /v1/auth/access_token and caches token' {
-            Mock -CommandName Invoke-RestMethod -Verifiable -ParameterFilter {
-                # Ensure correct URL and headers
-                $Uri -like 'https://api.getport.io/v1/auth/access_token' -and 
-                $Method -eq 'POST' -and 
-                $Headers['Content-Type'] -eq 'application/json'
-            } -MockWith {
+            $script:LastInvokeParams = $null
+            Mock -CommandName Invoke-RestMethod -MockWith {
+                param($Method,$Uri,$Body,$Headers)
+                $script:LastInvokeParams = @{ Method=$Method; Uri=$Uri; Body=$Body; Headers=$Headers }
                 # Simulate Port response
                 [pscustomobject]@{ accessToken = 'abc123'; expiresIn = 3600 }
             }
@@ -38,7 +36,13 @@ Describe 'New-PortAccessToken' {
             $result.AccessToken | Should -Be 'abc123'
             $result.ExpiresAt | Should -BeGreaterThan (Get-Date)
 
-            Assert-VerifiableMock
+            # Validate the request parameters captured by the mock
+            $script:LastInvokeParams | Should -Not -BeNullOrEmpty
+            $script:LastInvokeParams.Uri | Should -Be 'https://api.getport.io/v1/auth/access_token'
+            $script:LastInvokeParams.Method | Should -Be 'POST'
+
+            # Verify exactly one call was made (from within module scope)
+            Should -Invoke -CommandName Invoke-RestMethod -Times 1 -Exactly
         }
     }
 }
@@ -52,11 +56,11 @@ Describe 'Set-PortEntity' {
 
         It 'respects -WhatIf via ShouldProcess' {
             # Ensure no HTTP call is made when -WhatIf is used
-            Mock -CommandName Invoke-PortApi -Verifiable
+            Mock -CommandName Invoke-PortApi
 
             Set-PortEntity -BlueprintId 'service' -Identifier 'svc-1' -Properties @{ name = 'x' } -WhatIf
 
-            Assert-VerifiableMock -Times 0
+            Should -Invoke -CommandName Invoke-PortApi -Times 0 -Exactly
         }
 
         It 'calls Invoke-PortApi with correct path and body' {

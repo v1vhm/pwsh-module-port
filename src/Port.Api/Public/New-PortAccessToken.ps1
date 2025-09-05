@@ -49,12 +49,13 @@ function New-PortAccessToken {
     }
     if (-not $BaseUri) { throw 'BaseUri must be provided or set via Set-PortConnection.' }
 
-    $uri = [System.Uri]::new($BaseUri.TrimEnd('/'), 'v1/auth/access_token')
+    # Build full auth URI robustly (avoid ambiguous Uri ctor overloads)
+    $uri = "$( $BaseUri.TrimEnd('/') )/v1/auth/access_token"
     $body = @{ clientId = $ClientId; clientSecret = $ClientSecret }
 
     $irmParams = @{
         Method      = 'POST'
-        Uri         = $uri.AbsoluteUri
+        Uri         = $uri
         Body        = ($body | ConvertTo-Json)
         Headers     = @{ 'Content-Type' = 'application/json'; 'Accept' = 'application/json' }
         ErrorAction = 'Stop'

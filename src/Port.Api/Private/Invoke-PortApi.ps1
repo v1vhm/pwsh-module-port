@@ -28,7 +28,8 @@ function Invoke-PortApi {
         $null = New-PortAccessToken -ErrorAction Stop
     }
 
-    $uri = [System.Uri]::new($BaseUri.TrimEnd('/'), $Path.TrimStart('/'))
+    # Build full request URI robustly (avoid ambiguous Uri ctor overloads)
+    $uri = "$( $BaseUri.TrimEnd('/') )/$( $Path.TrimStart('/') )"
 
     $defaultHeaders = @{
         'Authorization' = "Bearer $($script:PortContext.AccessToken)"
@@ -41,7 +42,7 @@ function Invoke-PortApi {
 
     $irmParams = @{
         Method      = $Method
-        Uri         = $uri.AbsoluteUri
+        Uri         = $uri
         Headers     = $defaultHeaders
         ErrorAction = 'Stop'
     }
@@ -64,4 +65,3 @@ function Invoke-PortApi {
         throw $_
     }
 }
-
