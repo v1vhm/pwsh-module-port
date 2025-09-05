@@ -1,5 +1,8 @@
 # Port.Api PowerShell Module
 
+[![CI](https://github.com/v1vhm/pwsh-module-port/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/v1vhm/pwsh-module-port/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/v1vhm/pwsh-module-port?display_name=tag&sort=semver)](https://github.com/v1vhm/pwsh-module-port/releases)
+
 A PowerShell module for interacting with the Port API. Initial focus is authenticating with Port and upserting entities.
 
 This repository follows PowerShell module best practices for structure, naming, and help.
@@ -10,6 +13,7 @@ This repository follows PowerShell module best practices for structure, naming, 
   - Public cmdlets: `Set-PortConnection`, `New-PortAccessToken`, `Set-PortEntity`
   - Private helper: `Invoke-PortApi`
 - CI: tests run on Windows/Linux; artifacts uploaded per build
+ - Releases: see https://github.com/v1vhm/pwsh-module-port/releases
 
 ## Requirements
 

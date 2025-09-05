@@ -146,7 +146,7 @@ Status: ✅ Completed (2025-09-05)
 
 ## Phase 4 — Release Automation
 
-Status: 🚧 In progress (2025-09-05)
+Status: ✅ Completed (2025-09-05)
 
 **Goal:** Ship versioned artifacts tied to GitHub Releases.
 
@@ -158,7 +158,7 @@ Status: 🚧 In progress (2025-09-05)
   * Validate + package module
   * Attach artifact(s) to Release
   * (Optional) Generate release notes from conventional commits
-* Add README badge for CI status and link to Releases
+* Add README badge for CI status and link to Releases — ✅ Completed (2025-09-05)
 
 **Deliverables**
 
@@ -218,6 +218,7 @@ Status: 🚧 In progress (2025-09-05)
 * [x] **P1**: Foundation validated; import succeeds; docs aligned
 * [x] **P2**: Auth + Upsert implemented; CI green; artifact published
 * [x] **P3**: Tests expanded; analyzer clean; docs/examples improved
+* [x] **P4**: Release automation wired; versioned artifacts on Releases
 * [ ] **P4**: Release workflow; tagged builds attach artifacts
 * [ ] **P5**: UX polish; logging; nicer errors
 
