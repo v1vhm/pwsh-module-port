@@ -61,14 +61,24 @@ function Invoke-PortApi {
     }
     catch {
         $response = $_.Exception.Response
-        if ($response -and $response.ContentLength -gt 0) {
-            try {
-                $reader = New-Object System.IO.StreamReader($response.GetResponseStream())
-                $content = $reader.ReadToEnd()
+        $statusCode = $null
+        $content = $null
+        try { if ($response) { $statusCode = [int]$response.StatusCode } } catch { }
+        try {
+            if ($response) {
+                $stream = $response.GetResponseStream()
+                if ($stream) {
+                    $reader = New-Object System.IO.StreamReader($stream)
+                    $content = $reader.ReadToEnd()
+                }
+            }
+        } catch { }
+        if (-not $content -and $_.ErrorDetails -and $_.ErrorDetails.Message) { $content = [string]$_.ErrorDetails.Message }
+        if (-not $statusCode -and $response -and $response.StatusCode) { $statusCode = $response.StatusCode }
 
+        if ($response -or $content) {
+            try {
                 # Defaults
-                $statusCode = $response.StatusCode
-                try { $statusCode = [int]$response.StatusCode } catch { }
                 $errorCode = $null
                 $msg = $null
                 $details = $null
@@ -86,9 +96,10 @@ function Invoke-PortApi {
                 $pathHint = $null
                 if ($details -and $details.instancePath) { $pathHint = [string]$details.instancePath }
 
-                $summary = "Port API error: $statusCode"
+                $summary = "Port API error"
+                if ($statusCode) { $summary += ": $statusCode" }
                 if ($errorCode) { $summary += " $errorCode" }
-                $summary += " - $msg"
+                if ($msg) { $summary += " - $msg" }
                 if ($pathHint) { $summary += " (path: $pathHint)" }
 
                 # Build rich ErrorRecord without leaking secrets
@@ -110,7 +121,7 @@ function Invoke-PortApi {
                     elseif ($statusCode -ge 500) { $category = [System.Management.Automation.ErrorCategory]::InvalidOperation }
                 }
 
-                $errId = "PortApi:$statusCode" + ($(if ($errorCode) { ":$errorCode" } else { '' }))
+                $errId = "PortApi:" + ($(if ($statusCode) { "$statusCode" } else { 'HTTP' })) + ($(if ($errorCode) { ":$errorCode" } else { '' }))
                 $err = New-Object System.Management.Automation.ErrorRecord($ex, $errId, $category, $uri)
                 if ($PSCmdlet) { $PSCmdlet.ThrowTerminatingError($err) } else { throw $ex }
             } catch {

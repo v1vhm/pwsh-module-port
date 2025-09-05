@@ -73,13 +73,23 @@ function New-PortAccessToken {
     } catch {
         # Surface clearer message if possible; avoid leaking secrets
         $response = $_.Exception.Response
-        if ($response -and $response.ContentLength -gt 0) {
-            try {
-                $reader = New-Object System.IO.StreamReader($response.GetResponseStream())
-                $content = $reader.ReadToEnd()
+        $statusCode = $null
+        $content = $null
+        try { if ($response) { $statusCode = [int]$response.StatusCode } } catch { }
+        try {
+            if ($response) {
+                $stream = $response.GetResponseStream()
+                if ($stream) {
+                    $reader = New-Object System.IO.StreamReader($stream)
+                    $content = $reader.ReadToEnd()
+                }
+            }
+        } catch { }
+        if (-not $content -and $_.ErrorDetails -and $_.ErrorDetails.Message) { $content = [string]$_.ErrorDetails.Message }
+        if (-not $statusCode -and $response -and $response.StatusCode) { $statusCode = $response.StatusCode }
 
-                $statusCode = $response.StatusCode
-                try { $statusCode = [int]$response.StatusCode } catch { }
+        if ($response -or $content) {
+            try {
                 $msg = $null
                 $errorCode = $null
                 try {
@@ -89,9 +99,10 @@ function New-PortAccessToken {
                 } catch { }
                 if ([string]::IsNullOrWhiteSpace($msg)) { $msg = $content }
 
-                $summary = "Port API auth failed: $statusCode"
+                $summary = "Port API auth failed"
+                if ($statusCode) { $summary += ": $statusCode" }
                 if ($errorCode) { $summary += " $errorCode" }
-                $summary += " - $msg"
+                if ($msg) { $summary += " - $msg" }
 
                 $ex = [System.Exception]::new($summary)
                 $ex.Data['PortApiAuthError'] = [pscustomobject]@{
@@ -102,7 +113,7 @@ function New-PortAccessToken {
                 }
                 $err = New-Object System.Management.Automation.ErrorRecord(
                     $ex,
-                    ("PortApiAuth:{0}{1}" -f $statusCode, ($(if ($errorCode) { ":$errorCode" } else { '' }))),
+                    ("PortApiAuth:{0}{1}" -f ($(if ($statusCode) { "$statusCode" } else { 'HTTP' })), ($(if ($errorCode) { ":$errorCode" } else { '' }))),
                     [System.Management.Automation.ErrorCategory]::SecurityError,
                     $uri
                 )
