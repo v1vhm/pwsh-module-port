@@ -67,3 +67,12 @@ $v=(Get-Module -ListAvailable Pester | Sort-Object Version -Descending | Select 
 
 - Endpoints and request payloads are implemented with conservative defaults and are easy to adjust. Validate against the latest Port API documentation.
 - Client secret handling: provided as a string for HTTP exchange; avoid persisting secrets.
+
+**Release Process**
+
+- Bump Version: Update `ModuleVersion` and `ReleaseNotes` in `src/Port.Api/Port.Api.psd1`.
+- Create Tag/Release: Tag the repo (e.g., `v0.1.1`) or publish a GitHub Release.
+- Automation: The workflow in `.github/workflows/release.yml` runs on tag/release, validates with Pester + PSScriptAnalyzer, packages the module, and attaches artifacts to the Release.
+- Artifacts: Zips per OS matrix (e.g., `port-api-ubuntu-latest.zip`, `port-api-windows-latest.zip`) containing `Port.Api.psd1`, `Port.Api.psm1`, and the `Public/` and `Private/` folders.
+- Consumption: Download the zip from the Release, extract, then `Import-Module ./Port.Api/Port.Api.psd1 -Force` from the extracted path.
+- Pre-release: If using prerelease labels, adjust `PrivateData.PSData.Prerelease` in the manifest as needed.
