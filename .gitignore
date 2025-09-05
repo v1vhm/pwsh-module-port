@@ -1,0 +1,18 @@
+# VS Code and IDE
+.vscode/
+.idea/
+
+# Build outputs
+out/
+bin/
+obj/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# PowerShell artifacts
+*.nupkg
+*.ps1xml
+*.cache
+
