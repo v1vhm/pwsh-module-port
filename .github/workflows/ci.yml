@@ -9,6 +9,8 @@ on:
 jobs:
   test-and-package:
     name: Test, Analyze, and Package
+    permissions:
+      contents: read
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
