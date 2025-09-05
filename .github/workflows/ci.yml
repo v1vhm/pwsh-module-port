@@ -19,6 +19,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Verify PowerShell version (>= 7.2)
+        shell: pwsh
+        run: |
+          $v = $PSVersionTable.PSVersion
+          Write-Host "Using PowerShell $($PSVersionTable.PSEdition) $v"
+          if ($PSVersionTable.PSEdition -ne 'Core' -or $v -lt [version]'7.2') {
+            throw "PowerShell 7.2+ (Core) is required. Current: $($PSVersionTable.PSEdition) $v"
+          }
+
       - name: Install Pester 5
         shell: pwsh
         run: |

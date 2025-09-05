@@ -45,6 +45,8 @@ Status: ✅ Completed (2025-09-05)
 
 ## Phase 2 — Core Features & CI
 
+Status: 🚧 In progress (2025-09-05)
+
 **Goal:** Implement working auth + upsert and add CI for tests and packaging.
 
 **Tasks**
@@ -84,6 +86,13 @@ Status: ✅ Completed (2025-09-05)
 
 * Working `New-PortAccessToken` and `Set-PortEntity`
 * Passing CI with test results and build artifact
+
+**Progress Notes**
+
+* Added unit tests (Pester) to validate:
+  * `New-PortAccessToken` posts to `/v1/auth/access_token`, caches token/expiry
+  * `Set-PortEntity` honors `-WhatIf` and calls correct upsert path/body
+* CI already packages module and uploads artifacts per matrix OS
 
 ---
 

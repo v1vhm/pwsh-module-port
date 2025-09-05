@@ -6,9 +6,10 @@ This repository follows PowerShell module best practices for structure, naming, 
 
 ## Status
 
-- Scaffolding in place
-- Public cmdlets (stubs): `Set-PortConnection`, `New-PortAccessToken`, `Set-PortEntity`
-- Private helper: `Invoke-PortApi`
+- Core features implemented
+  - Public cmdlets: `Set-PortConnection`, `New-PortAccessToken`, `Set-PortEntity`
+  - Private helper: `Invoke-PortApi`
+- CI: tests run on Windows/Linux; artifacts uploaded per build
 
 ## Requirements
 
