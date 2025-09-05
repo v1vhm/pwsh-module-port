@@ -19,11 +19,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup PowerShell 7.2
-        uses: PSModule/install-powershell@v1
-        with:
-          Version: '7.2.x'
-
       - name: Install Pester 5
         shell: pwsh
         run: |
