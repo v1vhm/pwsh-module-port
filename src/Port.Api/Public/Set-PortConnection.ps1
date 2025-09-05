@@ -21,8 +21,22 @@ function Set-PortConnection {
     .DESCRIPTION
     Stores client credentials and base API URI in module scope for subsequent commands.
 
+    .PARAMETER ClientId
+    The Port client ID from your tenant credentials.
+
+    .PARAMETER ClientSecret
+    The Port client secret from your tenant credentials. Not persisted.
+
+    .PARAMETER BaseUri
+    The base API URI for your region (e.g. https://api.getport.io).
+
     .EXAMPLE
     Set-PortConnection -ClientId 'id' -ClientSecret 'secret' -BaseUri 'https://api.getport.io'
+
+    .NOTES
+    Secrets are stored only in memory for the session and are not logged.
+    .LINK
+    SPEC.md
     #>
 
     if ($PSCmdlet.ShouldProcess($BaseUri, 'Set Port connection context')) {
@@ -36,4 +50,3 @@ function Set-PortConnection {
         return [pscustomobject]$script:PortContext
     }
 }
-

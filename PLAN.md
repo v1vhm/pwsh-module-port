@@ -8,6 +8,14 @@
 
 ## Phase 1 — Review & Foundation
 
+Status: ✅ Completed (2025-09-05)
+
+- Updated manifest to target PowerShell 7.2 (Core).
+- Corrected auth endpoint to `/v1/auth/access_token` per SPEC.
+- Implemented upsert path `v1/blueprints/<BlueprintId>/entities?upsert=true&merge=true` with URL encoding.
+- Added optional `-Title` to `Set-PortEntity` and expanded help stubs for public cmdlets.
+- Smoke test passed via Pester (module imports, exports correct cmdlets, context set).
+
 **Goal:** Validate scaffolding, align to best practices, and ensure a clean baseline.
 
 **Tasks**
@@ -182,7 +190,7 @@
 
 ## Milestone Checklist
 
-* [ ] **P1**: Foundation validated; import succeeds; docs aligned
+* [x] **P1**: Foundation validated; import succeeds; docs aligned
 * [ ] **P2**: Auth + Upsert implemented; CI green; artifact published
 * [ ] **P3**: Tests expanded; analyzer clean; docs/examples improved
 * [ ] **P4**: Release workflow; tagged builds attach artifacts

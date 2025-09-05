@@ -18,11 +18,25 @@ function New-PortAccessToken {
     .DESCRIPTION
     Calls the Port access token endpoint using client credentials. If parameters are not provided, uses values set via Set-PortConnection.
 
+    .PARAMETER ClientId
+    Optional client ID; if omitted, uses the value set via Set-PortConnection.
+
+    .PARAMETER ClientSecret
+    Optional client secret; if omitted, uses the value set via Set-PortConnection.
+
+    .PARAMETER BaseUri
+    Optional base API URI; if omitted, uses the value set via Set-PortConnection.
+
     .EXAMPLE
     New-PortAccessToken
 
     .EXAMPLE
     New-PortAccessToken -ClientId 'id' -ClientSecret 'secret' -BaseUri 'https://api.getport.io'
+
+    .NOTES
+    Does not write secrets to logs. Caches token and a pre-expiry timestamp in memory.
+    .LINK
+    SPEC.md
     #>
 
     $ctx = $script:PortContext
@@ -35,7 +49,7 @@ function New-PortAccessToken {
     }
     if (-not $BaseUri) { throw 'BaseUri must be provided or set via Set-PortConnection.' }
 
-    $uri = [System.Uri]::new($BaseUri.TrimEnd('/'), 'v1/auth/access-token')
+    $uri = [System.Uri]::new($BaseUri.TrimEnd('/'), 'v1/auth/access_token')
     $body = @{ clientId = $ClientId; clientSecret = $ClientSecret }
 
     $irmParams = @{
@@ -71,4 +85,3 @@ function New-PortAccessToken {
         BaseUri     = $BaseUri
     }
 }
-

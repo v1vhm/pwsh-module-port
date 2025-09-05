@@ -12,7 +12,9 @@ This repository follows PowerShell module best practices for structure, naming, 
 
 ## Requirements
 
-- PowerShell 5.1 or later (PowerShell 7+ recommended)
+- PowerShell 7.2 (Core)
+- Pester 5+ (install via `Install-Module Pester -Scope CurrentUser -MinimumVersion 5.5.0`)
+  - Note: The inbox Pester 3.x in Windows PowerShell 5.1 is not supported.
 
 ## Quick Start
 
@@ -41,15 +43,23 @@ Set-PortEntity -BlueprintId 'service' -Identifier 'my-service' -Properties @{ na
 ## Development
 
 ```powershell
-# Run tests
-Invoke-Pester -Path tests
+# Install Pester 5 if needed
+Install-Module Pester -Scope CurrentUser -MinimumVersion 5.5.0
+
+# Run tests (requires PS 7.2+)
+./scripts/Invoke-Tests.ps1
 
 # Import locally
 Import-Module ./src/Port.Api/Port.Api.psd1 -Force
+```
+
+If you prefer a one-liner without the script:
+
+```powershell
+$v=(Get-Module -ListAvailable Pester | Sort-Object Version -Descending | Select -First 1).Version.Major; if($v -ge 5){ Invoke-Pester -Path tests -CI } else { Invoke-Pester -Path tests -EnableExit }
 ```
 
 ## Notes
 
 - Endpoints and request payloads are implemented with conservative defaults and are easy to adjust. Validate against the latest Port API documentation.
 - Client secret handling: provided as a string for HTTP exchange; avoid persisting secrets.
-

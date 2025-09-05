@@ -13,8 +13,8 @@
     Copyright         = '(c) 2025 Your Org. All rights reserved.'
     Description       = 'PowerShell module for interacting with the Port API (auth + entity upsert).'
 
-    PowerShellVersion = '5.1'
-    CompatiblePSEditions = @('Desktop','Core')
+    PowerShellVersion = '7.2'
+    CompatiblePSEditions = @('Core')
 
     # Functions are exported via Export-ModuleMember in the psm1
     FunctionsToExport = @('*')
