@@ -3,7 +3,7 @@
     RootModule        = 'Port.Api.psm1'
 
     # Semantic version
-    ModuleVersion     = '0.1.1'
+    ModuleVersion     = '0.2.0'
 
     # Unique module GUID
     GUID              = '6a7d8a1f-8e1d-4a0a-9b0b-8c6c3f2e3a44'
@@ -28,8 +28,7 @@
             ProjectUri = 'https://example.com/your-repo'
             LicenseUri = ''
             IconUri    = ''
-            ReleaseNotes = 'v0.1.1: Added Pester tests (auth, upsert, token refresh); fixed URI construction; CI enforces PS 7.2.'
-            Prerelease = 'alpha'
+            ReleaseNotes = 'v0.2.0: Friendlier, structured error handling; safer -Verbose logging; Release badges added; Phase 4 complete.'
         }
     }
 }
