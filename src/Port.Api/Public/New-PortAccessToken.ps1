@@ -33,6 +33,12 @@ function New-PortAccessToken {
     .EXAMPLE
     New-PortAccessToken -ClientId 'id' -ClientSecret 'secret' -BaseUri 'https://api.getport.io'
 
+    .EXAMPLE
+    # With prior Set-PortConnection, omit parameters for convenience
+    Set-PortConnection -ClientId 'id' -ClientSecret 'secret' -BaseUri 'https://api.getport.io'
+    $tok = New-PortAccessToken
+    $tok.AccessToken.Substring(0,10)
+
     .NOTES
     Does not write secrets to logs. Caches token and a pre-expiry timestamp in memory.
     .LINK

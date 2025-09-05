@@ -26,11 +26,14 @@ Import-Module (Join-Path $PSScriptRoot 'src/Port.Api/Port.Api.psd1') -Force
 # Configure connection (client ID/secret from Port)
 Set-PortConnection -ClientId 'your_client_id' -ClientSecret 'your_client_secret' -BaseUri 'https://api.getport.io'
 
-# Get a new access token
+# Get a new access token (uses connection details above)
 $token = New-PortAccessToken
 
-# Upsert an entity (example shape, verify with Port API docs)
+# Upsert an entity (non-destructive merge by default)
 Set-PortEntity -BlueprintId 'service' -Identifier 'my-service' -Properties @{ name = 'My Service'; tier = 'gold' }
+
+# Preview without making changes
+Set-PortEntity -BlueprintId 'service' -Identifier 'my-preview' -Properties @{ name = 'Preview' } -WhatIf
 ```
 
 ## Module Layout

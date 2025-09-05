@@ -52,6 +52,10 @@ function Set-PortEntity {
     .EXAMPLE
     Set-PortEntity -BlueprintId 'service' -Identifier 'svc-1' -Title 'Service One' -Properties @{ tier = 'gold' } -Relations @{ team = @('platform') }
     
+    .EXAMPLE
+    # Use -WhatIf to preview the request without making changes
+    Set-PortEntity -BlueprintId 'service' -Identifier 'svc-2' -Properties @{ name = 'Preview' } -WhatIf
+    
     .NOTES
     Uses non-destructive merge semantics by default (upsert=true&merge=true).
     .LINK

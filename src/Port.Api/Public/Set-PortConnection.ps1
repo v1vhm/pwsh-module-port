@@ -33,6 +33,12 @@ function Set-PortConnection {
     .EXAMPLE
     Set-PortConnection -ClientId 'id' -ClientSecret 'secret' -BaseUri 'https://api.getport.io'
 
+    .EXAMPLE
+    # Use default BaseUri (EU) and then request a token
+    Set-PortConnection -ClientId 'id' -ClientSecret 'secret'
+    $null = New-PortAccessToken
+    # Subsequent calls will reuse the cached token until near expiry
+
     .NOTES
     Secrets are stored only in memory for the session and are not logged.
     .LINK

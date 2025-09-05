@@ -45,7 +45,7 @@ Status: ✅ Completed (2025-09-05)
 
 ## Phase 2 — Core Features & CI
 
-Status: 🚧 In progress (2025-09-05)
+Status: ✅ Completed (2025-09-05)
 
 **Goal:** Implement working auth + upsert and add CI for tests and packaging.
 
@@ -87,16 +87,16 @@ Status: 🚧 In progress (2025-09-05)
 * Working `New-PortAccessToken` and `Set-PortEntity`
 * Passing CI with test results and build artifact
 
-**Progress Notes**
+**Notes**
 
-* Added unit tests (Pester) to validate:
-  * `New-PortAccessToken` posts to `/v1/auth/access_token`, caches token/expiry
-  * `Set-PortEntity` honors `-WhatIf` and calls correct upsert path/body
-* CI already packages module and uploads artifacts per matrix OS
+* Unit tests validate auth call + caching, upsert path/body, and `-WhatIf`
+* CI packages module and uploads artifacts on all matrix OS
 
 ---
 
 ## Phase 3 — Compatibility & Quality
+
+Status: ✅ Completed (2025-09-05)
 
 **Goal:** Solidify reliability, compatibility, and code quality.
 
@@ -113,6 +113,20 @@ Status: 🚧 In progress (2025-09-05)
     * Success/failure of auth (mock `Invoke-RestMethod`)
     * Token refresh path
     * Upsert success (201/200), validation error surface (400/422)
+
+**Progress Notes**
+
+* Added tests covering:
+  * Auth happy path (POST /v1/auth/access_token) with caching
+  * Token refresh triggered when expired; Authorization uses refreshed token
+  * `Set-PortEntity` WhatIf behavior and correct upsert path/body
+  * Error bubbling for failed HTTP calls
+  
+**Follow-up Tasks (optional)**
+
+* CI: Pin PowerShell explicitly (e.g., use `actions/setup-pwsh@v1` with `7.2.x`) rather than relying on runner default + version check.
+* Tests: Expand error-path assertions for 401/422 to validate surfaced status/message content precisely.
+* Help/Docs: Flesh out comment-based help with more concrete, runnable examples; ensure README usage mirrors help examples.
 * **Static Analysis**
 
   * PSScriptAnalyzer (fail on errors; warn on style)
@@ -125,12 +139,14 @@ Status: 🚧 In progress (2025-09-05)
 
 **Deliverables**
 
-* Green tests, clean analyzer output, updated docs
-* Tagged pre-release or release candidate
+* Green tests, clean analyzer output, updated docs/examples
+* Ready for tagging (pre-release or release candidate)
 
 ---
 
 ## Phase 4 — Release Automation
+
+Status: 🚧 In progress (2025-09-05)
 
 **Goal:** Ship versioned artifacts tied to GitHub Releases.
 
@@ -200,8 +216,8 @@ Status: 🚧 In progress (2025-09-05)
 ## Milestone Checklist
 
 * [x] **P1**: Foundation validated; import succeeds; docs aligned
-* [ ] **P2**: Auth + Upsert implemented; CI green; artifact published
-* [ ] **P3**: Tests expanded; analyzer clean; docs/examples improved
+* [x] **P2**: Auth + Upsert implemented; CI green; artifact published
+* [x] **P3**: Tests expanded; analyzer clean; docs/examples improved
 * [ ] **P4**: Release workflow; tagged builds attach artifacts
 * [ ] **P5**: UX polish; logging; nicer errors
 

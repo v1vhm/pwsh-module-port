@@ -88,3 +88,100 @@ Describe 'Set-PortEntity' {
         }
     }
 }
+
+Describe 'Invoke-PortApi token refresh and error flow' {
+    InModuleScope Port.Api {
+        BeforeEach {
+            Set-PortConnection -ClientId 'CLIENT' -ClientSecret 'SECRET' -BaseUri 'https://api.getport.io' | Out-Null
+            # Force expiry to require refresh
+            $script:PortContext.AccessToken = 'expired-token'
+            $script:PortContext.TokenExpiry = (Get-Date).AddMinutes(-10)
+        }
+
+        It 'refreshes token when expired before calling API' {
+            $script:Captured = $null
+
+            Mock -CommandName New-PortAccessToken -MockWith { 
+                $script:PortContext.AccessToken = 'new-token'
+                [pscustomobject]@{ AccessToken='new-token'; ExpiresAt=(Get-Date).AddMinutes(30) }
+            }
+
+            Mock -CommandName Invoke-RestMethod -MockWith {
+                param($Method,$Uri,$Headers)
+                $script:Captured = @{ Method=$Method; Uri=$Uri; Auth=$Headers['Authorization'] }
+                [pscustomobject]@{ ok = $true }
+            }
+
+            $resp = Invoke-PortApi -Method GET -Path 'v1/ping'
+            $resp.ok | Should -BeTrue
+
+            # Ensure refresh occurred and auth header used new token
+            Should -Invoke -CommandName New-PortAccessToken -Times 1 -Exactly
+            $script:Captured.Auth | Should -Be 'Bearer new-token'
+            $script:Captured.Uri  | Should -Be 'https://api.getport.io/v1/ping'
+        }
+
+        It 'bubbles exceptions from Port calls' {
+            Mock -CommandName New-PortAccessToken -MockWith { [pscustomobject]@{ AccessToken='tok'; ExpiresAt=(Get-Date).AddMinutes(30) } }
+            Mock -CommandName Invoke-RestMethod -MockWith { throw 'Synthetic failure 422: validation' }
+
+            { Invoke-PortApi -Method POST -Path 'v1/blueprints/svc/entities' -Body @{ identifier='x' } } | Should -Throw
+        }
+
+        It 'surfaces 401 Unauthorized with body content' {
+            function New-FakeHttpException {
+                param([int]$Status,[string]$Content)
+                $bytes = [System.Text.Encoding]::UTF8.GetBytes($Content)
+                $resp = New-Object psobject
+                $resp | Add-Member NoteProperty StatusCode $Status
+                $resp | Add-Member NoteProperty ContentLength $bytes.Length
+                $resp | Add-Member NoteProperty Bytes $bytes
+                $resp | Add-Member ScriptMethod GetResponseStream { param() ([System.IO.MemoryStream]::new($this.Bytes)) }
+                $ex = [System.Exception]::new("HTTP $Status")
+                $ex | Add-Member NoteProperty Response $resp
+                return $ex
+            }
+
+            Mock -CommandName New-PortAccessToken -MockWith { [pscustomobject]@{ AccessToken='tok'; ExpiresAt=(Get-Date).AddMinutes(30) } }
+            Mock -CommandName Invoke-RestMethod -MockWith { throw (New-FakeHttpException -Status 401 -Content '{"message":"Unauthorized"}') }
+
+            $thrown = $false; $msg = $null
+            try { 
+                Invoke-PortApi -Method GET -Path 'v1/secure'
+            } catch {
+                $thrown = $true; $msg = $_.Exception.Message
+            }
+            $thrown | Should -BeTrue
+            $msg | Should -Match '401'
+            $msg | Should -Match 'Unauthorized'
+        }
+
+        It 'surfaces 422 Validation error with body content' {
+            function New-FakeHttpException2 {
+                param([int]$Status,[string]$Content)
+                $bytes = [System.Text.Encoding]::UTF8.GetBytes($Content)
+                $resp = New-Object psobject
+                $resp | Add-Member NoteProperty StatusCode $Status
+                $resp | Add-Member NoteProperty ContentLength $bytes.Length
+                $resp | Add-Member NoteProperty Bytes $bytes
+                $resp | Add-Member ScriptMethod GetResponseStream { param() ([System.IO.MemoryStream]::new($this.Bytes)) }
+                $ex = [System.Exception]::new("HTTP $Status")
+                $ex | Add-Member NoteProperty Response $resp
+                return $ex
+            }
+
+            Mock -CommandName New-PortAccessToken -MockWith { [pscustomobject]@{ AccessToken='tok'; ExpiresAt=(Get-Date).AddMinutes(30) } }
+            Mock -CommandName Invoke-RestMethod -MockWith { throw (New-FakeHttpException2 -Status 422 -Content '{"message":"validation error"}') }
+
+            $thrown = $false; $msg = $null
+            try {
+                Invoke-PortApi -Method POST -Path 'v1/blueprints/svc/entities' -Body @{ identifier='x' }
+            } catch {
+                $thrown = $true; $msg = $_.Exception.Message
+            }
+            $thrown | Should -BeTrue
+            $msg | Should -Match '422'
+            $msg | Should -Match 'validation'
+        }
+    }
+}
