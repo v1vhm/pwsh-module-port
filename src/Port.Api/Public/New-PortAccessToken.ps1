@@ -68,8 +68,47 @@ function New-PortAccessToken {
     }
 
     try {
+        Write-Verbose ("Requesting access token from {0}" -f $uri)
         $resp = Invoke-RestMethod @irmParams
     } catch {
+        # Surface clearer message if possible; avoid leaking secrets
+        $response = $_.Exception.Response
+        if ($response -and $response.ContentLength -gt 0) {
+            try {
+                $reader = New-Object System.IO.StreamReader($response.GetResponseStream())
+                $content = $reader.ReadToEnd()
+
+                $statusCode = $response.StatusCode
+                try { $statusCode = [int]$response.StatusCode } catch { }
+                $msg = $null
+                $errorCode = $null
+                try {
+                    $json = $content | ConvertFrom-Json -ErrorAction Stop
+                    $msg = $json.message ?? $json.error ?? $null
+                    $errorCode = $json.error ?? $json.code
+                } catch { }
+                if ([string]::IsNullOrWhiteSpace($msg)) { $msg = $content }
+
+                $summary = "Port API auth failed: $statusCode"
+                if ($errorCode) { $summary += " $errorCode" }
+                $summary += " - $msg"
+
+                $ex = [System.Exception]::new($summary)
+                $ex.Data['PortApiAuthError'] = [pscustomobject]@{
+                    StatusCode = $statusCode
+                    Error      = $errorCode
+                    Message    = $msg
+                    Uri        = $uri
+                }
+                $err = New-Object System.Management.Automation.ErrorRecord(
+                    $ex,
+                    ("PortApiAuth:{0}{1}" -f $statusCode, ($(if ($errorCode) { ":$errorCode" } else { '' }))),
+                    [System.Management.Automation.ErrorCategory]::SecurityError,
+                    $uri
+                )
+                if ($PSCmdlet) { $PSCmdlet.ThrowTerminatingError($err) } else { throw $ex }
+            } catch { throw $_ }
+        }
         throw $_
     }
 

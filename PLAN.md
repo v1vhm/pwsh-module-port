@@ -168,6 +168,8 @@ Status: ✅ Completed (2025-09-05)
 
 ## Phase 5 — Hardening & UX polish (ongoing)
 
+Status: 🚧 In progress (2025-09-05)
+
 **Goal:** Improve user experience without expanding API surface yet.
 
 **Tasks**

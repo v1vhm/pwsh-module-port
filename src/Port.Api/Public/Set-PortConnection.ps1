@@ -53,6 +53,7 @@ function Set-PortConnection {
             AccessToken  = $null
             TokenExpiry  = Get-Date '2001-01-01'
         }
+        Write-Verbose ("Connection context set for BaseUri: {0}" -f $script:PortContext.BaseUri)
         return [pscustomobject]$script:PortContext
     }
 }
