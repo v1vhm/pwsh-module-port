@@ -14,10 +14,10 @@
     Description       = 'PowerShell module for interacting with the Port API (auth + entity upsert).'
 
     PowerShellVersion = '7.2'
-    CompatiblePSEditions = @('Core')
+    CompatiblePSEditions = @('Core','Desktop')
 
     # Functions are exported via Export-ModuleMember in the psm1
-    FunctionsToExport = @('*')
+    FunctionsToExport = @('New-PortAccessToken','Set-PortConnection','Set-PortEntity')
     AliasesToExport   = @()
     VariablesToExport = @()
     CmdletsToExport   = @()
